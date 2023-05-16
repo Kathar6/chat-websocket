@@ -1,13 +1,14 @@
-import { Router } from "express";
+import { Router } from "express"
 
 // Validators
-import validateLoginSchema from "../validators/login.js";
+import validateLoginSchema from "../validators/login.js"
 
 // Controllers
-import authController from "../controllers/authController.js";
+import authController from "../controllers/authController.js"
 
-const router = Router();
+const router = Router()
 
-router.post("/login", validateLoginSchema, authController.login);
+router.post("/login", validateLoginSchema, authController.login)
+router.post("/register", validateLoginSchema, authController.register)
 
-export default router;
+export default router
