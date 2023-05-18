@@ -11,15 +11,18 @@ const emailProperty = {
   format: "email",
 }
 
-const loginSchema = {
+const registerSchema = {
   type: "object",
   properties: {
     email: emailProperty,
     password: {
       type: "string",
     },
+    "confirm-password": {
+      type: "string",
+    },
   },
-  required: ["email", "password"],
+  required: ["email", "password", "confirm-password"],
   additionalProperties: false,
   errorMessage: mainErrorMessages,
 }
@@ -28,7 +31,7 @@ const ajv = new Ajv({ allErrors: true })
 addFormats(ajv, ["email"])
 addErrors(ajv)
 
-const validate = ajv.compile(loginSchema)
+const validate = ajv.compile(registerSchema)
 
 /**
  *
@@ -36,7 +39,7 @@ const validate = ajv.compile(loginSchema)
  * @param {import("express").Response} res
  * @param {import("express").NextFunction} next
  */
-const validateLoginSchema = (req, res, next) => {
+const validateRegisterSchema = (req, res, next) => {
   const isValid = validate(req.body)
   if (!isValid)
     return res
@@ -45,4 +48,4 @@ const validateLoginSchema = (req, res, next) => {
   next()
 }
 
-export default validateLoginSchema
+export default validateRegisterSchema
