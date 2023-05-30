@@ -1,15 +1,15 @@
-import Ajv from "ajv"
-import addFormats from "ajv-formats"
-import addErrors from "ajv-errors"
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+import addErrors from "ajv-errors";
 
 const mainErrorMessages = {
   type: "should be an object",
-}
+};
 
 const emailProperty = {
   type: "string",
   format: "email",
-}
+};
 
 const loginSchema = {
   type: "object",
@@ -22,13 +22,13 @@ const loginSchema = {
   required: ["email", "password"],
   additionalProperties: false,
   errorMessage: mainErrorMessages,
-}
+};
 
-const ajv = new Ajv({ allErrors: true })
-addFormats(ajv, ["email"])
-addErrors(ajv)
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv, ["email"]);
+addErrors(ajv);
 
-const validate = ajv.compile(loginSchema)
+const validate = ajv.compile(loginSchema);
 
 /**
  *
@@ -37,12 +37,9 @@ const validate = ajv.compile(loginSchema)
  * @param {import("express").NextFunction} next
  */
 const validateLoginSchema = (req, res, next) => {
-  const isValid = validate(req.body)
-  if (!isValid)
-    return res
-      .status(400)
-      .send(ajv.errorsText(validate.errors, { separator: "\n" }))
-  next()
-}
+  const isValid = validate(req.body);
+  if (!isValid) return res.status(400).send(validate.errors);
+  next();
+};
 
-export default validateLoginSchema
+export default validateLoginSchema;

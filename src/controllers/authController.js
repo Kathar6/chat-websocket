@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 
 // Models
-import UserModel from "../models/users.js"
+import UserModel from "../models/users.js";
 
 // Utils
 import {
@@ -9,8 +9,23 @@ import {
   successMessage,
   hashPassword,
   comparePasswords,
-} from "../utils/index.js"
-import TokenSigner from "../utils/jwt/signer.js"
+} from "../utils/index.js";
+import TokenSigner from "../utils/jwt/signer.js";
+
+/**
+ *
+ * @param {import("express").Response} res
+ * @param {any} token
+ */
+const buildAuthCookie = (res, token) => {
+  res.cookie("auth", token, {
+    httpOnly: true,
+    maxAge: 3600,
+    domain: process.env.FRONT_DOMAIN,
+    path: "/",
+    sameSite: "lax",
+  });
+};
 
 class AuthController {
   /**
@@ -20,29 +35,27 @@ class AuthController {
    * @returns authentication token
    */
   async login(req, res) {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     // Find if the user does not exist
-    const userFound = await UserModel.findOne({ email }).exec()
+    const userFound = await UserModel.findOne({ email }).exec();
 
-    if (!userFound) return res.errorMessage(400, "User or Password mismatch")
+    if (!userFound) return res.errorMessage(400, "User or Password mismatch");
 
-    const isSamePassword = await comparePasswords(password, userFound.password)
+    const isSamePassword = await comparePasswords(password, userFound.password);
 
     if (!isSamePassword)
-      return res.errorMessage(400, "User or Password mismatch")
+      return res.errorMessage(400, "User or Password mismatch");
 
     // Create token and retrieve to user
     const signer = new TokenSigner({
       sub: userFound._id,
-    })
-    signer.build()
-    const token = await signer.sign()
+    });
+    signer.build();
+    const token = await signer.sign();
+    buildAuthCookie(res, token);
 
-    res.cookie("auth", token, {
-      httpOnly: true,
-    })
-    return res.successMessage(200, "Logged in")
+    return res.successMessage(200, "Logged in");
   }
 
   /**
@@ -52,19 +65,19 @@ class AuthController {
    * @returns
    */
   async register(req, res) {
-    const { email, password, "confirm-password": confirmPassword } = req.body
+    const { email, password, "confirm-password": confirmPassword } = req.body;
 
     // Check if passwords match
     if (password !== confirmPassword)
-      return res.errorMessage(400, "Passwords do not match")
+      return res.errorMessage(400, "Passwords do not match");
 
     // Find if user already exists
-    const userFound = await UserModel.findOne({ email }).exec()
+    const userFound = await UserModel.findOne({ email }).exec();
 
     if (userFound)
-      return res.status(409).json(errorMessage("User already exists"))
+      return res.status(409).json(errorMessage("User already exists"));
 
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(password);
 
     const newUser = new UserModel({
       _id: uuidv4(),
@@ -72,12 +85,12 @@ class AuthController {
       password: hashedPassword,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
+    });
 
-    await newUser.save()
+    await newUser.save();
 
-    return res.status(201).json(successMessage("User saved successfully"))
+    return res.status(201).json(successMessage("User saved successfully"));
   }
 }
 
-export default new AuthController()
+export default new AuthController();
