@@ -1,17 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
 
 // Models
-import UserModel from "../models/users.js";
+import UserModel from "../models/users.js"
 
 // Utils
-import {
-  errorMessage,
-  successMessage,
-  hashPassword,
-  comparePasswords,
-} from "../utils/index.js";
-import TokenSigner from "../utils/jwt/signer.js";
-import AuthService from "../services/auth.js";
+import { errorMessage, successMessage, hashPassword } from "../utils/index.js"
+import TokenSigner from "../utils/jwt/signer.js"
+import AuthService from "../services/auth.js"
 
 /**
  *
@@ -27,14 +22,14 @@ class AuthController {
    * @returns authentication token
    */
   async login(req, res) {
-    const { email, password } = req.body;
+    const { email, password } = req.body
     try {
-      const service = new AuthService();
-      const { token, config } = await service.signin({ email, password });
-      res.cookie("auth", token, config);
-      return res.successMessage(200, "Logged in");
+      const service = new AuthService()
+      const { token, config } = await service.signin({ email, password })
+      res.cookie("auth", token, config)
+      return res.successMessage(200, "Logged in")
     } catch (error) {
-      return res.errorMessage(400, error);
+      return res.errorMessage(400, error)
     }
   }
 
@@ -45,32 +40,23 @@ class AuthController {
    * @returns
    */
   async register(req, res) {
-    const { email, password, "confirm-password": confirmPassword } = req.body;
+    const { email, password, "confirm-password": confirmPassword } = req.body
 
-    // Check if passwords match
-    if (password !== confirmPassword)
-      return res.errorMessage(400, "Passwords do not match");
+    try {
+      const service = new AuthService()
+      await service.register({
+        email,
+        password,
+        "confirm-password": confirmPassword,
+      })
 
-    // Find if user already exists
-    const userFound = await UserModel.findOne({ email }).exec();
-
-    if (userFound)
-      return res.status(409).json(errorMessage("User already exists"));
-
-    const hashedPassword = await hashPassword(password);
-
-    const newUser = new UserModel({
-      _id: uuidv4(),
-      email,
-      password: hashedPassword,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    await newUser.save();
-
-    return res.status(201).json(successMessage("User saved successfully"));
+      return res.successMessage(200, "User saved successfully")
+    } catch (error) {
+      const code = error.code ?? 400
+      const message = error.message
+      return res.errorMessage(code, message)
+    }
   }
 }
 
-export default new AuthController();
+export default new AuthController()
