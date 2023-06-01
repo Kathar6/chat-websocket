@@ -23,7 +23,6 @@ class UserController {
    * @param {import("express").Response} res
    */
   async current(req, res) {
-    console.log(res.locals.user);
     return res.json({
       user: res.locals.user,
     });
