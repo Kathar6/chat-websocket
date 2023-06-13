@@ -1,11 +1,11 @@
-import { WebSocketServer } from "ws"
+import { WebSocketServer } from "ws";
 
 /**
  *
  * @param {import("node:http").Server} server
  */
-export const bootstrap = (server) => {
-  if (!server) throw new Error("Server not available")
-  const wsServer = new WebSocketServer({ server })
-  return wsServer
-}
+export const bootstrap = (httpServer) => {
+  if (!httpServer) throw new Error("Server not available");
+  const server = new WebSocketServer({ server: httpServer });
+  return server;
+};

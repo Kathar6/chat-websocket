@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { bootstrap as bootstrapWs } from "./websockets/server.js";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 // Routes
 import authRouter from "./routes/auth.js";
 import userRouter from "./routes/users.js";
@@ -12,7 +15,12 @@ import responseMiddleware from "./middleware/response.js";
 
 const app = express();
 
-app.use(cors());
+const corsConfig = {
+  origin: process.env.FRONT_ORIGIN,
+  credentials: true,
+};
+
+app.use(cors(corsConfig));
 app.use(express.json()); // JSON formatter
 app.use(express.text()); // Plain text formatter
 app.use(responseMiddleware); // Response middleware

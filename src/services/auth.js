@@ -1,14 +1,19 @@
 // Models
-import UserModel from "../models/users.js"
+import UserModel from "../models/users.js";
 
 // Utils
-import { hashPassword, comparePasswords } from "../utils/index.js"
-import TokenSigner from "../utils/jwt/signer.js"
+import { hashPassword, comparePasswords } from "../utils/index.js";
+import TokenSigner from "../utils/jwt/signer.js";
 
 // Vendor
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
 
 class AuthService {
+  getExpiration() {
+    const expiration = new Date();
+    expiration.setHours(expiration.getHours() + 1);
+    return expiration;
+  }
   /**
    * retrieve the cookie configuration
    * @returns {httpOnly: boolean, maxAge: number, domain: string, path: string, sameSite: string} cookie config
@@ -16,11 +21,11 @@ class AuthService {
   getCookieConfig() {
     return {
       httpOnly: true,
-      maxAge: 3600,
-      domain: process.env.FRONT_DOMAIN,
+      expires: this.getExpiration(),
+      sameSite: "none",
       path: "/",
-      sameSite: "lax",
-    }
+      secure: true,
+    };
   }
 
   /**
@@ -31,9 +36,9 @@ class AuthService {
   generateToken(user) {
     const signer = new TokenSigner({
       sub: user._id,
-    })
-    signer.build()
-    return signer
+    });
+    signer.build();
+    return signer;
   }
 
   /**
@@ -42,8 +47,8 @@ class AuthService {
    * @returns {string} auth token
    */
   async getToken(signer) {
-    const token = await signer.sign()
-    return token
+    const token = await signer.sign();
+    return token;
   }
 
   /**
@@ -52,18 +57,18 @@ class AuthService {
    * @returns {{token: string, config: Record<string, any>}} token and config to generate the cookie
    */
   async signin(data) {
-    const { email, password } = data
+    const { email, password } = data;
 
-    const userFound = await UserModel.findOne({ email }).exec()
-    if (!userFound) throw "User or password mismatch"
-    const isSamePassword = await comparePasswords(password, userFound.password)
+    const userFound = await UserModel.findOne({ email }).exec();
+    if (!userFound) throw "User or password mismatch";
+    const isSamePassword = await comparePasswords(password, userFound.password);
 
-    if (!isSamePassword) throw "User or password mismatch"
+    if (!isSamePassword) throw "User or password mismatch";
 
-    const signer = this.generateToken(userFound)
-    const token = await this.getToken(signer)
-    const config = this.getCookieConfig()
-    return { token, config }
+    const signer = this.generateToken(userFound);
+    const token = await this.getToken(signer);
+    const config = this.getCookieConfig();
+    return { token, config };
   }
 
   /**
@@ -71,25 +76,25 @@ class AuthService {
    * @returns {boolean} response indicating whether the user is registered successfully or an error occurred
    */
   async register(data) {
-    const { email, password, "confirm-password": confirmPassword } = data
+    const { email, password, "confirm-password": confirmPassword } = data;
 
     // Check if passwords match
     if (password !== confirmPassword)
       throw {
         code: 400,
         message: "Passwords do not match",
-      }
+      };
 
     // Find if user already exists
-    const userFound = await UserModel.findOne({ email }).exec()
+    const userFound = await UserModel.findOne({ email }).exec();
 
     if (userFound)
       throw {
         code: 409,
         message: "User already exists",
-      }
+      };
 
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await hashPassword(password);
 
     const newUser = new UserModel({
       _id: uuidv4(),
@@ -97,11 +102,11 @@ class AuthService {
       password: hashedPassword,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
+    });
 
-    await newUser.save()
-    return true
+    await newUser.save();
+    return true;
   }
 }
 
-export default AuthService
+export default AuthService;
