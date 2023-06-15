@@ -7,8 +7,8 @@ import cookie from "cookie";
  */
 const getAuthToken = (req) => {
   const cookies = cookie.parse(req.headers.cookie || "");
-  console.log(cookies);
-  if (req.cookies && req.cookies.auth) return req.cookies.auth;
+  const cookieToken = cookies[process.env.AUTH_COOKIE_NAME];
+  if (cookieToken) return cookieToken;
   if (req.headers.authorization) return req.headers.authorization;
   if (req.query?.token) return req.query.token;
   return null;
