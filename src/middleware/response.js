@@ -1,4 +1,4 @@
-import { errorMessage, successMessage } from "../utils/index.js"
+import { DefaultResponse } from "../utils/index.js";
 
 /**
  *
@@ -7,13 +7,23 @@ import { errorMessage, successMessage } from "../utils/index.js"
  * @param {import("express").NextFunction} next
  */
 const responseMiddleware = (req, res, next) => {
-  res.successMessage = (code = 200, message = "") => {
-    return res.status(code).json(successMessage(message))
-  }
-  res.errorMessage = (code = 400, message = "") => {
-    return res.status(code).json(errorMessage(message))
-  }
-  next()
-}
+  /**
+   * @param {string} status
+   */
+  const formatter = (status) => {
+    const handler = new DefaultResponse(status);
 
-export default responseMiddleware
+    handler.send = () => {
+      handler._prepareResponse();
+      return res.status(handler._status).json(handler.response);
+    };
+
+    return handler;
+  };
+
+  res.response = formatter;
+
+  next();
+};
+
+export default responseMiddleware;

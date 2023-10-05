@@ -15,13 +15,24 @@ class AuthController {
    */
   async login(req, res) {
     const { email, password } = req.body;
+
     try {
       const service = new AuthService();
+
       const { token, config } = await service.signin({ email, password });
+
       res.cookie(process.env.AUTH_COOKIE_NAME, token, config);
-      return res.successMessage(200, "Logged in");
+
+      const data = {
+        token,
+      };
+
+      const response = res.response(200).setData(data).setMessage("Logged in");
+
+      return response.send();
     } catch (error) {
-      return res.errorMessage(400, error);
+      console.error(error);
+      return res.response(400).setError(error).send();
     }
   }
 
@@ -42,11 +53,12 @@ class AuthController {
         "confirm-password": confirmPassword,
       });
 
-      return res.successMessage(200, "User saved successfully");
+      // return res.successMessage(200, "User saved successfully");
+      return res.response(200).setMessage("User saved successfully").send();
     } catch (error) {
-      const code = error.code ?? 400;
+      const code = error.statusCode ?? 400;
       const message = error.message;
-      return res.errorMessage(code, message);
+      return res.response(code).setError(message).send();
     }
   }
 }

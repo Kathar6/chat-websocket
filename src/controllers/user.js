@@ -27,13 +27,16 @@ class UserController {
    */
   async current(req, res) {
     const service = new UserService();
+
     try {
       const userInfo = service.currentUser(res.locals);
-      return res.successMessage(200, userInfo);
+
+      return res.response(200).setData(userInfo).send();
     } catch (error) {
+      console.error(error);
       const code = error?.code;
       const message = error?.message;
-      return res.errorMessage(code, message);
+      return res.response(code).setError(message);
     }
   }
 }

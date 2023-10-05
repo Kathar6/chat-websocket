@@ -10,7 +10,7 @@ class TokenParser {
 
   parse() {
     try {
-      // Enconde the secret
+      // Encode the secret
       const encoder = new TextEncoder();
       const secretEncoded = encoder.encode(this.secret);
       return jwtVerify(this.token, secretEncoded);

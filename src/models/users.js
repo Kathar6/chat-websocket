@@ -8,6 +8,7 @@ const userSchema = mongoose.Schema({
   updated_at: Date,
 });
 
+/** @type {import("mongoose").Collection} */
 const UserModel = mongoose.model("users", userSchema);
 
 export default UserModel;

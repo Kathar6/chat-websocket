@@ -49,9 +49,5 @@ export const bootstrap = async (port) => {
   });
 
   // bootstraps Websocket server
-  const wsServer = bootstrapWs(server);
-
-  wsServer.on("connection", (stream) => {
-    console.log("connected");
-  });
+  bootstrapWs(server);
 };

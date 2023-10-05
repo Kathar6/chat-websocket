@@ -44,7 +44,7 @@ class AuthService {
   /**
    * Sign the token an retrieve it
    * @param {TokenSigner} signer
-   * @returns {string} auth token
+   * @returns {Promise<string>} auth token
    */
   async getToken(signer) {
     const token = await signer.sign();
@@ -54,7 +54,7 @@ class AuthService {
   /**
    * Validates the user information and return the token and config to create a cookie
    * @param {{email: string, password: string}} data
-   * @returns {{token: string, config: Record<string, any>}} token and config to generate the cookie
+   * @returns {Promise<{token: string, config: Record<string, any>}>} token and config to generate the cookie
    */
   async signin(data) {
     const { email, password } = data;
@@ -73,7 +73,7 @@ class AuthService {
 
   /**
    * @param {{email: string, password: string, 'confirm-password':string}} data
-   * @returns {boolean} response indicating whether the user is registered successfully or an error occurred
+   * @returns {Promise<boolean>} response indicating whether the user is registered successfully or an error occurred
    */
   async register(data) {
     const { email, password, "confirm-password": confirmPassword } = data;

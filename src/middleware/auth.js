@@ -4,16 +4,17 @@ import UserModel from "../models/users.js";
 // Utils
 import TokenParser from "../utils/jwt/parser.js";
 import getAuthToken from "../utils/getAuthToken.js";
+import JWTErrorHandler from "../utils/jwt/errorHandler.js";
 
 /**
  *
  * @param {import("express").Response} res
  */
 const sendUnAuthorizedResponse = (res) => {
-  return res.errorMessage(
-    401,
-    "You need to be logged in, in order to access this view"
-  );
+  return res
+    .response(401)
+    .setError("You need to be logged in, in order to access this view")
+    .send();
 };
 
 /**
@@ -32,7 +33,6 @@ const authMiddleware = async (req, res, next) => {
     // Getting the user id
     const parsedToken = await parser.parse();
     const userId = parsedToken.payload?.sub;
-
     const user = await UserModel.findById(userId).exec();
     if (!user) return sendUnAuthorizedResponse(res);
 
@@ -43,7 +43,12 @@ const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.errorMessage(400, "An error occurred while validating the user");
+    console.error(error);
+    const errorHandler = new JWTErrorHandler(error);
+
+    const response = errorHandler.getResponse();
+
+    return res.response(response.code).setError(response.error).send();
   }
 };
 
