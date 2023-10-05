@@ -18,15 +18,18 @@ class JWTErrorHandler {
   }
 
   _getDefaultResponse() {
-    return [400, "An error occurred while validating the user"];
+    return {
+      code: 400,
+      error: "An error occurred while validating the user",
+    };
   }
 
   getResponse() {
     if (!this.error) return this._getDefaultResponse();
 
-    const response =
-      errorsCommand[this.error.code] || this._getDefaultResponse();
+    let response = errorsCommand[this.error.code];
 
+    if (!response) response = this._getDefaultResponse();
     return response;
   }
 }

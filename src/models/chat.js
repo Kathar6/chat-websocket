@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const chatSchema = mongoose.Schema({
   _id: String,
-  origin: String,
-  target: String,
+  susbscribers: [String],
   created_at: Date,
 });
 

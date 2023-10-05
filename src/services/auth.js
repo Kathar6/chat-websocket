@@ -14,6 +14,7 @@ class AuthService {
     expiration.setHours(expiration.getHours() + 1);
     return expiration;
   }
+
   /**
    * retrieve the cookie configuration
    * @returns {httpOnly: boolean, maxAge: number, domain: string, path: string, sameSite: string} cookie config

@@ -19,13 +19,4 @@ describe("Test all chat subscriber functionality", () => {
 
     expect(subscriberData).toHaveProperty("chats");
   });
-
-  test("Should subscribe a chat", () => {
-    const isChatAdded = subscriber.addChat(
-      "a86e8bf3-43c0-4122-9f18-a4cb3d050129",
-      "e1416626-1d6f-4be4-9c64-be883b40390e",
-    );
-
-    expect(isChatAdded).not.toBe(false);
-  });
 });

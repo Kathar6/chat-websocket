@@ -30,7 +30,7 @@ class WebSocketAuthenticator {
         errorMessage.error,
         "token: ",
         this.token,
-        "\x1b[0m"
+        "\x1b[0m",
       );
       return false;
     }
@@ -40,7 +40,9 @@ class WebSocketAuthenticator {
    * @param {import("http").IncomingHttpHeaders} headers
    */
   _getToken(headers) {
-    const protocols = headers["sec-websocket-protocol"].split(",");
+    const raw_protocol = headers["sec-websocket-protocol"];
+    if (!raw_protocol) return "";
+    const protocols = raw_protocol.split(",");
     return protocols[0];
   }
 

@@ -31,6 +31,7 @@ class AuthController {
 
       return response.send();
     } catch (error) {
+      console.error("code: ", error.code);
       console.error(error);
       return res.response(400).setError(error).send();
     }

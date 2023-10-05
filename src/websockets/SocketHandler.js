@@ -56,7 +56,7 @@ class WebSocketHandler {
 
     socket.on(
       "message",
-      (message) => new MessageManager(authenticatorData?.id, message),
+      (message) => new MessageManager(socket, authenticatorData?.id, message),
     );
 
     socket.on("pong", (socket) => this._setClientAlive(socket));
