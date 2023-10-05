@@ -44,8 +44,8 @@ export const bootstrap = async (port) => {
   dbConnection.connect();
 
   const server = app.listen(port, () => {
-    console.log(`Listening on port \x1b[96m ${port} `);
-    swaggerSetup(app, process.env.SWAGGER_PORT);
+    console.log(`Listening on port \x1b[96m ${port} \x1b[0m`);
+    swaggerSetup(app);
   });
 
   // bootstraps Websocket server

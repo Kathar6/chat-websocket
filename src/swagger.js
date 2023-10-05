@@ -60,7 +60,7 @@ const options = {
 
 const openApiSpecification = swaggerJSDoc(options);
 
-const swaggerSetup = (app, port) => {
+const swaggerSetup = (app) => {
   app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiSpecification));
 
   console.log("docs available");
